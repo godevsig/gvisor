@@ -855,7 +855,7 @@ func TestClosingWithEnqueuedSegments(t *testing.T) {
 		t.Errorf("got stats.TCP.CurrentEstablished.Value() = %d, want = 0", got)
 	}
 
-	// Check if the endpoint was moved to CLOSED and netstack a reset in
+	// Check if the endpoint was moved to CLOSED and netstack sent a reset in
 	// response to the ACK packet that we sent after last-ACK.
 	checker.IPv4(t, c.GetPacket(),
 		checker.TCP(
