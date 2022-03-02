@@ -19,6 +19,7 @@
 #include "absl/time/time.h"
 #include "test/util/file_descriptor.h"
 #include "test/util/test_util.h"
+#include "test/util/thread_util.h"
 #include "test/util/time_util.h"
 
 namespace gvisor {
@@ -70,6 +71,21 @@ TEST(ExitTest, CloseFds) {
   char buf[10];
   EXPECT_THAT(ReadFd(read_fd.get(), buf, sizeof(buf)),
               SyscallSucceedsWithValue(0));
+}
+
+TEST(ExitTest, ExitAllThreads) {
+  pid_t pid = fork();
+  if (pid == 0) {
+    ScopedThread t([] { SleepSafe(absl::Seconds(999)); });
+    SleepSafe(absl::Seconds(1));
+    _exit(0);
+  }
+
+  ASSERT_THAT(pid, SyscallSucceeds());
+
+  int status;
+  EXPECT_THAT(RetryEINTR(waitpid)(pid, &status, 0), SyscallSucceeds());
+  EXPECT_TRUE(WIFEXITED(status) && WEXITSTATUS(status) == 0) << status;
 }
 
 }  // namespace
