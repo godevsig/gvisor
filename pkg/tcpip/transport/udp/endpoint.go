@@ -396,13 +396,7 @@ func (e *endpoint) prepareForWrite(p tcpip.Payloader, opts tcpip.WriteOptions) (
 		return udpPacketInfo{}, err
 	}
 
-	// TODO(https://gvisor.dev/issue/6538): Avoid this allocation.
-	v := make([]byte, p.Len())
-	if _, err := io.ReadFull(p, v); err != nil {
-		ctx.Release()
-		return udpPacketInfo{}, &tcpip.ErrBadBuffer{}
-	}
-	if len(v) > header.UDPMaximumPacketSize {
+	if p.Len() > header.UDPMaximumPacketSize {
 		// Payload can't possibly fit in a packet.
 		so := e.SocketOptions()
 		if so.GetRecvError() {
@@ -411,11 +405,18 @@ func (e *endpoint) prepareForWrite(p tcpip.Payloader, opts tcpip.WriteOptions) (
 				e.net.NetProto(),
 				header.UDPMaximumPacketSize,
 				dst,
-				v,
+				nil,
 			)
 		}
 		ctx.Release()
 		return udpPacketInfo{}, &tcpip.ErrMessageTooLong{}
+	}
+
+	// TODO(https://gvisor.dev/issue/6538): Avoid this allocation.
+	v := make([]byte, p.Len())
+	if _, err := io.ReadFull(p, v); err != nil {
+		ctx.Release()
+		return udpPacketInfo{}, &tcpip.ErrBadBuffer{}
 	}
 
 	return udpPacketInfo{
