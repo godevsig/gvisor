@@ -1,5 +1,6 @@
 FROM tensorflow/tensorflow:1.13.2
 
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update \
     && apt-get install -y git
 RUN git clone --depth 1 https://github.com/aymericdamien/TensorFlow-Examples.git

@@ -1,4 +1,5 @@
 FROM ubuntu:bionic
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update && apt-get install -y net-tools git iptables iputils-ping \
         netcat tcpdump jq tar bison flex make
 # Pick up updated git.

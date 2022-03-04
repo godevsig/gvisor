@@ -5,6 +5,7 @@ RUN go mod download
 RUN CGO_ENABLED=0 go build -o /hey hey.go
 
 FROM ubuntu:18.04
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN set -x \
         && apt-get update \
         && apt-get install -y \

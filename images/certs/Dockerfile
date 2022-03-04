@@ -5,6 +5,7 @@ FROM ubuntu:18.04
 WORKDIR /certs
 ADD server.conf /conf/server.conf
 # Install openssl.
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update && apt-get install -y openssl
 # Create all certificates.
 CMD openssl genrsa -out caKey.pem 2048 && \
