@@ -30,6 +30,12 @@ steps:
       - make release RELEASE_NIGHTLY=$$RELEASE_NIGHTLY
       - cd repo && gsutil cp -r . gs://gvisor/releases/
   - <<: *common
+    label: ":ship: Kythe"
+    if: build.tag == null # Don't build tags.
+    commands:
+      - make kythe-index
+      - gsutil cp *.kzip gs://gvisor-kythe-xrefs
+  - <<: *common
     label: ":ship: Website Deploy"
     commands:
       # The built website image must be x86_64.

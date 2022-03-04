@@ -39,6 +39,7 @@ endif
 BRANCH_NAME := $(shell (git branch --show-current 2>/dev/null || \
   git rev-parse --abbrev-ref HEAD 2>/dev/null) | \
   xargs -n 1 basename 2>/dev/null)
+COMMIT_NAME := $(git rev-parse HEAD)
 BUILD_ROOTS := bazel-bin/ bazel-out/
 RACE_FLAGS := --@io_bazel_rules_go//go/config:race
 
